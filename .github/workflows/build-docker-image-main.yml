@@ -7,7 +7,12 @@ on:
     # Ignore changes to deployment manifests
     paths-ignore:
     - deploy/**
-    
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}   
+  USERNAME: ${{ github.actor }}
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,8 +22,8 @@ jobs:
     - name: Login to Docker Hub
       uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
+        registry: ${{ env.REGISTRY }}
+        username: ${{ env.USERNAME }}
         password: ${{ secrets.GITHUB_TOKEN }}
     # Get the current date and time - we will use this as a tag for the image later
     - name: Get current date # get the date of the build
@@ -31,6 +36,6 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: >
-          ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_REPO }}:${{ steps.date.outputs.date }}, 
-          ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_REPO }}:latest
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.date.outputs.date }}, 
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           
